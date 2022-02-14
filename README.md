@@ -6,6 +6,9 @@
 - 📫 How to reach me: stros.seb@gmail.com
 
 Completed Projects:
+Causal Inference and Machine Learning for Politics - Module at Humboldt University, programming in R
+First half of the module focused on Causal Inference methods such as Difference-in-Differences, Instrumental Variables, Interaction Effects, Reggression Discontinuity Design.
+Second half of the module focused on Machine Learning methods such as dimension reduction for OLS reggression (Lasso and Ridge Reggressions), Logistic Reggression, Tree-based methods (bagging, boosting, random forests), Support Vector Machines (theory only), Deep Learning (Theory only).  
 
 
 
