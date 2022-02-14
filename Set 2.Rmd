@@ -1,0 +1,189 @@
+---
+title: "problemset2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Set 2
+### Felix Hartmann, Solver: Sebastian
+#### 04/11/2021
+### 1. Potential Outcomes
+#### Supposed that you have a random sample of size n from the population of interest. Answer the following questions that are designed to help you get familiar with potential outcomes. Try to keep your answers brief and your language precise. Throughout the problem, assume that the Stable Unit Treatment Value Assumption (SUTVA) holds.
+### a.	Explain the notation Yi(0)Yi(0).
+the potential outcome of not being treated
+### b.	Contrast the meaning of Yi(0)Yi(0) with the meaning of YiYi.
+the potential outcome of not being treated vs. any outcome 
+### c.	Contrast the meaning of Yi(0)Yi(0) with the meaning of Yi(1)Yi(1). Is it ever possible to observe both at the same time? Why?
+the potential outcome of not being treated vs. the potential outcome of being treated and they cannot be observed at the same time. They can be estimated simultaneously but not observed.
+### d.	Explain the notation E[Yi(0)|Di=1]E[Yi(0)|Di=1], where DiDi is a binary variable that gives the treatment status for subject ii, 11 if treated, 00 if control.
+the potential outcome of untreated unit which actually receives the treatment (ref. to BOX 2.1)
+### e.	Contrast the meaning of E[Yi(0)]E[Yi(0)] with the meaning of E[Yi|Di=0]E[Yi|Di=0].
+#### The former refers to the expected potential outcome of being treated. The latter refers to the expected observed outcome which was actually assigned the treatment.
+
+
+### f.	Contrast the meaning of E[Yi(0)|Di=1]E[Yi(0)|Di=1] with the meaning of E[Yi(0)|Di=0]E[Yi(0)|Di=0].
+The former is a counterfactual which cannot be observed; it is the expected potential untreated outcome of a unit which actually recieves the treatment.
+### g.	Which of the following quantities (that you explained in parts (d) through (f)) can be iden- tified from observed information? Do not make any additional assumptions about the distributions of YY or DD, except the SUTVA and also that there is at least one observation with Di=1Di=1, and at least one with Di=0Di=0 in the observed data.
+#### 1.	E[Yi(0)|Di=1]E[Yi(0)|Di=1]
+cannot be observed
+#### 2.	E[Yi(0)]E[Yi(0)]
+cannot be observed
+#### 3.	E[Yi|Di=0]E[Yi|Di=0]
+we can observe 
+#### 4.	E[Yi(0)|Di=0]E[Yi(0)|Di=0]
+we can observe
+### h.	Now, assume that DiDi is randomly assigned to the units in this sample. Which of the above quantities can be identified from the observed data?
+1, 2, 4 can be idetified
+
+## 2. Expectations
+### Use the data from Table 2.1 in Gerber & Green (2012) and load it into a dataframe in R. Show that E[Yi(0)−E[Yi(1)]=E[Yi(0)−Yi(1)]E[Yi(0)−E[Yi(1)]=E[Yi(0)−Yi(1)]
+``` {r , inculde = TRUE}
+ind <- 1:7
+
+Yi0 <- c(10, 15, 20, 20, 10, 15, 15)
+Yi1 <- c(15, 15, 30, 15, 20, 15, 30)
+left_hand_side <- Yi1 - Yi0
+righ_hand_side <- Yi1[ind] - Yi0[ind]
+
+left_hand_side
+righ_hand_side
+villages <- data.frame(Treated = Yi1, Control = Yi0, Left = left_hand_side, Rigt = righ_hand_side)
+
+villages
+
+identical(left_hand_side, righ_hand_side)
+
+
+```
+
+##3. Different Research Designs
+#### A researcher plans to ask six subjects to donate time to an adult literacy program. Each subject will be asked to donate either 30 or 60 minutes. The researcher is considering three methods for randomizing the treatment. One method is to flip a coin before talk- ing to each person and to ask for a 30-minute donation if the coin comes up heads or a 60-minute donation if it comes up tails. The second method is to write “30” and “60” on three playing cards each, and then shuffle the six cards. The first subject would be as- signed the number on the first card, the second subject would be assigned the number on the second card, and so on. A third method is to write each number on three different slips of paper, seal the six slips into envelopes, and shuffle the six envelopes before talk- ing to the first subject. The first subject would be assigned the first envelope, the second subject would be assigned the second envelope, and so on.
+•	
+### a.	Discuss the strengths and weaknesses of each approach.
+#### The first approach's strength is that the coin tosses are random. The coin tosser cannot really influence the outcome of the toss. However, the weakness is that there is 1/32 chance that all subjects will be assigned to the either treatment or control group and there is 0.09375 probability that only one subject will be assigned to one group while 5 subjects will be assigned to the other group.
+#### The second and third approaches seem fairly similar. They both randomly allocate subjects into two equally large groups. Perhaps, the third approach is slightly superior because the envelopes better ensure the lack of knowledge of 60 or 30 minute allocation on the part of the researcher. The cards may be demaged by writing the numbers on them or may be damaged from previous use; therefore the reseacher may remember which the numbers to the corresponding cards. The envolped seem more standardized, more equivalent with each other withour stains from gambling nights. Though the envopes have more clinical de-personalized research vibe, my argument seems rather weak and if done properly, let's say with a new deck of cards, the two methods may be equally valid. Maybe I am missing something. 
+
+### b.	In what ways would your answer to (a) change if the number of subjects were 600 instead of 6?
+#### The probablities of allocating no subjects to one group would be so small that this would not be a threat; however, there is still 0.09375 probability that 500 subjects will be allocated to one group and only 100 to the other. Even though this is a smaller problem that with the 5 to 1 ratio it may be that the 100 subject group's outcomes are not numerous enough if for example their variance were large. We would then have high p-value and our research would fail to reject the sharp null hypothesis. 
+#### The envolepo and the card method would change. The same 50:50 ratio of controlled and treatment group sizes would be mainatin. However the results would be supported with lower p-value.
+
+### c.	What is the expected value of DD. (the assigned number of minutes) if the coin toss method is used? What is the expected value of D. if the sealed envelope method is used?
+#### Given the 600 subjects: Both methods will assign 4500 minutes in total; however the coin method will have this as the mean of its normally distributed assignment of minutes so other assignments are also possible yet less probable. In contrast, with the envelope method we get this with probability 1 and no other minutes are possible.
+
+
+ 
+### 4. Experimental Design
+#### Assume that you are conducting an intervention in during an election. Your goal is to assess the effect of deploying a new biometric voting machine on the incidence of electoral fraud at polling stations. Though the country is made up of 275 constituencies, due to the political context you are only allowed to perform your experiment within one constituency. Unconcerned, you and your team randomly select eight polling stations in the constituency, and among the eight, randomly assign half to receive the new voting machines and the other to serve as a control group. DiDi gives the resulting treatment status for each polling station ii, for i∈1,...,Ni∈1,...,N, where Di∈0,1Di∈0,1 and N = 8. The outcome of interest is the percentage of votes in a polling station attributable to fraud, YiYi.
+#### a.	Assume that both parts of SUTVA hold. Calculate, explaining your answer:
+#### i.	For each polling station i, the number of potential outcomes that can be defined;
+#### We can define four potential outcomes for each polling station. Yi(0)Di=0, Yi(0)Di=1, Yi(1)Di=0, Yi(1)Di(1)
+
+### ii.	For each polling station i, the number of unit treatment effects that can be defined; and,
+``` {r , inculde = TRUE}
+x <- 2^8
+non_I <- (sum(1:7)+sum(1:6)+sum(1:5)+sum(1:4)+sum(1:3)+sum(1:2)+1 + 4)*2
+non_I
+x - non_I
+
+  
+```
+
+
+#### iii.	For the sample of polling stations, the number of (unconditional) average treatment effect estimands that can be defined.
+#### The ATE for Yi is defind as E[Yi(1) - Yi(0)]
+
+
+
+#### Y(0l0) - Y(1l0)
+#### Y(0l1) - Y(1l1) 
+#### Y(0l0) - Y(1l1)
+#### Y(0l1) - Y(1l0)
+
+
+#### b.	A political insider gets wind of your study, and gives you some information. She says that because all of the polling stations in your study are within one small constituency, there will be interference between units. She explains how “interference” might occur in this case: The political operatives in each polling station who are responsible for committing fraud will move elsewhere if their efforts are frustrated. Their range of movement is predetermined by the geographic influence of the party bosses. Local conditions are such that the operatives in each polling station can only move to one, and only one, other polling station, as shown in the figure below.
+
+ 
+#### Operatives may move to only one other polling station, as indicated by the arrows (for example, from the second to third polling station, but not the reverse).
+###Given the structure in Figure 1, answer again questions (i) - (iii).
+#### (i) the interference between each and every subject would be 2^8, but the interference is only between the one consecutive. So, my idea is to substract the cases where is not interference from the 2^8. What I am relly not sure is hot to count these cases of non-interference. The idea I am working with is summing the connections and multipling them by two for the two possible treatments. I expresss these in sequnces. It's a shot albeit perhaps not the right on
+
+``` {r , inculde = TRUE}
+x <- 2^8
+non_I <- (sum(1:7)+sum(1:6)+sum(1:5)+sum(1:4)+sum(1:3)+sum(1:2)+1)*2
+
+  
+```
+#### (ii) 
+
+#### c.	Your funder is keen to spend their budget, and demands that you field the intervention as described originally: N=8N=8, and for Di=0,1Di=0,1, ∑Ni=1Di=4∑i=1NDi=4. You set aside your concerns, and observe the data in Figure 2 on the percentage of votes in each polling station attributable to fraud. Write out an appropriate estimator for the average treatment effect (ATE) given SUTVA. Drawing on your insights so far and your knowledge of causal inference, under what conditions will this estimator be unbiased? Apply it to the data and compute an estimate of the effect of the new biometric voting machines on the incidence of fraud.
+```{r , e = TRUE}
+
+
+unit <- c(1:8)
+Di <- c(1,1,0,1,0,0,0,1)
+Yi <- c(0.04,0.02, 0.08, 0.09, 0.12, 0.13, 0.04, 0.01)
+outcomes <- data.frame(Unit = unit, Di = Di, Yi = Yi)
+ind <- which (outcomes$Di == 1)
+Y1_D1 <- rep(NA, 8)
+Y0_D0 <- rep(NA, 8)
+Y1[ind] <-outcomes$Yi[ind]
+ind <- which (outcomes$Di == 0)
+Y0[ind] <-outcomes$Yi[ind]
+
+outcomes <- data.frame(Unit = unit, Di = Di, Yi = Yi, Y1_D1 = Y1_D1, Y0_D0 = Y0_D0)
+outcomes
+
+ind <- which (outcomes$Di == 1)
+Average_Treated <-mean(outcomes$Yi[ind])
+
+  
+ind <- which (outcomes$Di == 0)
+Average_Control <-mean(outcomes$Yi[ind])
+ATE <-   Average_Treated - Average_Control
+
+print(paste("Not controlling for bias: Yi(1) - Yi(0) = ", ATE))
+
+
+  
+```
+#### It may be argued that we face selection bias: the treated polling stations are selected because they are more likely to indulge in fraud. We may therefore apply equation 2.15 from Gerber Green Chapter 2 which defines selection bias.
+
+```{r , e = TRUE}
+
+
+
+Y0_D1 <- Y1 - ATE
+ind <- which (is.na(Y0_D1))
+Y0_D1[ind] <- Y0_D0[ind]
+
+Y1_D0 <- Y0 + ATE
+ind <- which (is.na(Y1_D0))
+ind
+Y1_D0[ind] <- Y1_D1[ind]
+
+
+outcomes <- data.frame(Unit = unit, Di = Di, Yi = Yi, Y1_D1 = Y1, Y0_D0 = Y0, Y0_D1 = Y0_D1, Y1_D0 = Y1_D0)
+outcomes
+
+Y0_D1
+Y0
+
+ATT <- Y1 - Y0_D1
+BIAS <- Y0_D1 - Y0
+
+ATT
+BIAS
+
+ATT + BIAS
+
+
+
+
+
+
+  
+```
+

@@ -1,0 +1,428 @@
+---
+title: "1st problem set"
+output: html_document
+
+---
+---
+title: "Problem Set 1"
+author: "Instructor: Felix Hartmann, Solver: Sebastian Stros"
+date: "29/10/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Complete all exercises in Chapter 2. 
+
+## 2.3 Exercises
+
+### 1. What is the sum of the first 100 positive integers? 
+``` {r , inculde = TRUE}
+
+n <- 100
+x <- n*(n + 1)/2
+print(x)
+
+```
+
+### 2. Now use the same formula to compute the sum of the integers from 1 through 1,000.
+``` {r, inculde = TRUE}
+n <- 1000
+x <- n*(n+1)/2
+print(x)
+```
+
+### 3. Based on the result, what do you think the functions seq and sum do? 
+#### seq() creates a list of values and sum() adds them up
+
+### 4.Use one line of code to compute the log, in base 10, of the square root of 100.
+
+``` {r, inculde = TRUE}
+log(base = 10, x = 100)
+```
+
+### 5. Which of the following will always return the numeric value stored in x?
+``` {r , inculde = TRUE}
+x <- 6
+log10(10^x)
+```
+####Therefore b.
+
+## 2.5 Exercises
+
+### 1. Which of the following best describes the variables represented in this data frame?
+``` {r , inculde = TRUE}
+
+library(dslabs)
+data(murders)
+str(murders)
+```
+####Therefore c.
+
+### 2. What are the column names used by the data frame for these five variables?
+``` {r , inculde = TRUE}
+names(murders)
+```
+
+### 3. Use the accessor $ to extract the state abbreviations and assign them to the object a. What is the class of this object?
+``` {r , inculde = TRUE}
+a <- murders$abb
+class(a)
+```
+
+### 4. Now use the square brackets to extract the state abbreviations and assign them to the object b. Use the identical function to determine if a and b are the same.
+
+``` {r , inculde = TRUE}
+
+b <- murders[["abb"]]
+
+identical(a,b)
+```
+##### note: Single square brackets lead to 51 state abbreviations, maybe something to discuss in the seminar
+
+### 5. With one line of code, use the function levels and length to determine the number of regions defined by this dataset.
+
+``` {r , inculde = TRUE}
+
+length(levels(murders$region))
+levels(murders$region)
+```
+
+### 6. Use this function table in one line of code to create a table of states per region.
+``` {r , inculde = TRUE}
+
+table(murders$region)
+```
+#### slightly surprised that here nothing more is needed, no distinction that I look for 'states' in contrast to eg. 'population'
+## 2.8 Exercises
+
+### 1. Create a vector with the average high temperatures 
+``` {r , inculde = TRUE}
+
+temp <- c( 35, 88, 42, 84, 81, 30)
+
+```
+### 2. Create a vector with names
+``` {r , inculde = TRUE}
+
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", "San Juan", "Toronto")
+
+```
+
+
+### 3. Use the names function and the objects defined in the previous exercises to associate the temperature data with its corresponding city.
+``` {r , inculde = TRUE}
+
+names(temp) <- city
+temp
+
+```
+
+
+### 4. Use the [ and : operators to access the temperature of the first three cities on the list.
+``` {r , inculde = TRUE}
+
+
+temp[1:3]
+
+```
+### 5. Use the [ operator to access the temperature of Paris and San Juan.
+``` {r , inculde = TRUE}
+
+
+temp[c("Paris", "San Juan")]
+
+```
+
+
+### 6. Use the : operator to create a sequence of numbers  
+``` {r , inculde = TRUE}
+
+
+1:73
+
+```
+
+### 7. Create a vector containing all the positive odd numbers smaller than 100.
+``` {r , inculde = TRUE}
+
+
+oddies <- c(seq(1,100,2))
+oddies
+
+```
+
+### 8. Create a vector of numbers that starts at 6, does not pass 55, and adds numbers in increments of 4/7: 6, 6 + 4/7, 6 + 8/7, and so on. How many numbers does the list have? Hint: use seq and length.
+``` {r , inculde = TRUE}
+
+
+strange_sequence <- c(seq(6,55,4/7))
+length(strange_sequence)
+
+
+```
+
+### 9. What is the class of the following object
+``` {r , inculde = TRUE}
+
+
+a <- seq(1, 10, 0.5)
+class(a)
+
+```
+
+### 10. What is the class of the following object
+``` {r , inculde = TRUE}
+
+
+a <- seq(1, 10)
+class(a)
+
+```
+
+### 11. The class of class(a<-1) is numeric, not integer. R defaults to numeric and to force an integer, you need to add the letter L. Confirm that the class of 1L is integer.
+``` {r , inculde = TRUE}
+
+
+class(a<-1L)
+
+```
+#### What exactly does the 'L' do?
+
+### 12. Define the following vector and coerce it to get integers:
+``` {r , inculde = TRUE}
+
+
+x<-c("1", "3", "5")
+as.numeric(x)
+
+```
+#### Would we really call this coercing? the other instances of coercing were actually coerced but here using a method it seems more like parsing. It is naming thing so whatever.
+
+## 2.10 Exercises
+
+### 1. Use the $ operator to access the population size data and store it as the object pop. Then use the sort function to redefine pop so that it is sorted. Finally, use the [ operator to report the smallest population size.
+
+``` {r , inculde = TRUE}
+
+pop <- murders$population
+pop <- sort(pop)
+pop[[1]]
+
+
+```
+
+
+
+### 2. Now instead of the smallest population size, find the index of the entry with the smallest population size. Hint: use order instead of sort.
+``` {r , inculde = TRUE}
+
+pop <- murders$population
+
+pop <- order(pop)
+pop[[1]]
+
+
+```
+
+### 3. We can actually perform the same operation as in the previous exercise using the function which.min. Write one line of code that does this.
+``` {r , inculde = TRUE}
+
+print(pop <- which.min(murders$population)) 
+
+
+```
+
+
+### 4. Now we know how small the smallest state is and we know which row represents it. Which state is it? 
+``` {r , inculde = TRUE}
+
+pop <- which.min(murders$population)
+states <- murders$state
+states[pop]
+
+
+```
+##### best state ever
+
+### 5. Use the rank function to determine the population rank of each state from smallest population size to biggest.
+``` {r , inculde = TRUE}
+
+pop <- rank(murders$population)
+
+ranks <- pop
+my_df <- data.frame(name = murders$state, population_rank = ranks)
+
+my_df
+
+```
+#### I did not know how to make it ascending. When I used sort() on the ranks, the ranks where made ascending but then they did not correspond to the states they were meant to correspond.
+
+
+
+### 6. Repeat the previous exercise, but this time order my_df so that the states are ordered from least populous to most populous.
+``` {r , inculde = TRUE}
+
+ranks <- rank(murders$population)
+
+
+
+my_df <- data.frame(name = murders$state, population_rank = ranks)
+
+
+my_df
+
+```
+#### I got stuck on the last two exercises for quite a lot of time then I gave up.
+### order the populations!
+
+### 7. Assign this logical vector to an object called ind and determine how many NAs does na_example have.
+``` {r , inculde = TRUE}
+
+data("na_example")
+str(na_example)
+ind<-is.na(na_example)
+sum(ind == "TRUE")
+```
+
+
+## 2.12 Exercises
+
+### 1. Remake the data frame using the code above, but add a line that converts the temperature from Fahrenheit to Celsius.
+``` {r , inculde = TRUE}
+
+temp <- c(35, 88, 42, 84, 81, 30)
+temp <- 5/9 * (temp - 32)
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", 
+          "San Juan", "Toronto")
+city_temps <- data.frame(name = city, temperature = temp)
+city_temps
+
+```
+
+### 2. What is the following sum
+``` {r , inculde = TRUE}
+denom<-1:100
+denom <- 1/denom^2
+sum(denom)
+```
+
+
+### 3. Compute the per 100,000 murder rate for each state and store it in the object murder_rate. Then compute the average murder rate for the US using the function mean. What is the average?
+``` {r , inculde = TRUE}
+
+murder_rate <- murders$total / murders$population * 100000
+mean(murder_rate)
+
+
+```
+
+
+## 2.14 Exercises
+
+### 1. Compute the per 100,000 murder rate for each state and store it in an object called murder_rate. Then use logical operators to create a logical vector named low that tells us which entries of murder_rate are lower than 1.
+``` {r , inculde = TRUE}
+
+murder_rate <- murders$total / murders$population * 100000
+low <- murder_rate < 1 
+
+low
+
+```
+
+### 2. Now use the results from the previous exercise and the function which to determine the indices of murder_rate associated with values lower than 1.
+``` {r , inculde = TRUE}
+
+
+ind <- which(low)
+ind
+
+```
+
+### 3. Use the results from the previous exercise to report the names of the states with murder rates lower than 1.
+``` {r , inculde = TRUE}
+
+
+low_m_states <- murders$state[ind]
+low_m_states
+```
+
+### 4. Now extend the code from exercises 2 and 3 to report the states in the Northeast with murder rates lower than 1.
+``` {r , inculde = TRUE}
+
+northeast <- murders$region == "Northeast"
+safe <- murder_rate < 1
+ind <- safe & northeast
+low_m_states <- murders$state[ind]
+low_m_states
+```
+
+### 5. In a previous exercise we computed the murder rate for each state and the average of these numbers. How many states are below the average?
+``` {r , inculde = TRUE}
+
+
+ind<-murder_rate < mean(murder_rate)
+sum(ind)
+
+```
+
+
+### 6. Use the match function to identify the states with abbreviations AK, MI, and IA. Hint: start by defining an index of the entries of murders$abb that match the three abbreviations, then use the [ operator to extract the states.
+``` {r , inculde = TRUE}
+
+
+ind <- match( c("AK", "MI", "IA"), murders$abb)
+murders$state[ind]
+
+```
+
+### 7. Use the %in% operator to create a logical vector that answers the question: which of the following are actual abbreviations: MA, ME, MI, MO, MU?
+``` {r , inculde = TRUE}
+
+ c("MA","ME", "MI", "MO", "MU")%in% murders$abb
+
+
+
+```
+### 8. Extend the code you used in exercise 7 to report the one entry that is not an actual abbreviation. Hint: use the ! operator, which turns FALSE into TRUE and vice versa, then which to obtain an index.
+
+``` {r , inculde = TRUE}
+
+
+booleans <- c("MA","ME", "MI", "MO", "MU")%in% murders$abb
+
+ind <- which(murders$abb == booleans)
+murders$state[ind]
+which(!c("Ma", "ME", "MI", "MO", "MU") %in% murders$abb)
+
+```
+#### I got stuck on the last exercise for too long, then I gave up on it.
+
+## 2.16 Exercises
+
+### 1. We made a plot of total murders versus population and noted a strong relationship. Not surprisingly, states with larger populations had more murders. Keep in mind that many states have populations below 5 million and are bunched up. We may gain further insights from making this plot in the log scale. Transform the variables using the log10 transformation and then plot them.
+``` {r , inculde = TRUE}
+
+population_in_millions <- murders$population/10^6
+
+total_gun_murders <- log(murders$total)
+
+
+plot(population_in_millions, total_gun_murders)
+```
+
+### 2. Create a histogram of the state populations.
+``` {r , inculde = TRUE}
+
+
+hist(population_in_millions)
+```
+
+### 3. Generate boxplots of the state populations by region.
+``` {r , inculde = TRUE}
+
+boxplot(population_in_millions~region, data = murders)
+
+```
+
+
