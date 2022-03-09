@@ -23,7 +23,7 @@ Causal Inference and Machine Learning for Politics - Module at Humboldt Universi
 - PS 9 was introduction to Machine Learning (bias, variance, K-nearest neighbors)
 - PS 10 was regression and classification
 - PS 11 looked at sparse and flexible regressions (lasso, ridge, smoothing by derivation)
-- PS 12 was introduction to decision tress
+- PS 12 was introduction to decision trees
 
 CodeAcademy course, Exploratory Data Analysis in Python
 pandas, numpy, matplotlib, seaborn
