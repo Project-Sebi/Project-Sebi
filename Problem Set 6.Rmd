@@ -1,0 +1,92 @@
+---
+title: "PS6"
+author: "Stros"
+date: "12/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### 1. 
+```{r , include=TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+d <-   read.csv ("olken.csv")
+
+head(d)
+
+ 
+
+
+```
+Treatment status is given by treat.invite, which takes a value of 1 if the village received the intervention and 0 if it did not. There are four pre-treatment covariates in the data: head.edu, the education of the village head; mosques, mosques per 1,000 residents; pct.poor, the percentage of households below the poverty line; and total.budget, the budget for each project.
+
+### a)
+```{r , include=TRUE}
+
+  
+
+balance_test <- d %>%
+  group_by(treat_invite) %>%
+  summarise(mean(d$mosques), sd(d$mosques), mean(d$pct_poor), sd(d$pct_poor), mean(d$total_budget), sd(d$total_budget))
+balance_test
+
+d %>% filter(treat_invite == 1) %>%
+  summarise(mean(d$mosques), sd(d$mosques), mean(d$pct_poor), sd(d$pct_poor), mean(d$total_budget), sd(d$total_budget))
+balance_test
+
+d %>% filter(treat_invite == 0) %>%
+  summarise(mean(d$mosques), sd(d$mosques), mean(d$pct_poor), sd(d$pct_poor), mean(d$total_budget), sd(d$total_budget))
+balance_test
+
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```

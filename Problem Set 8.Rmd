@@ -1,0 +1,235 @@
+---
+title: "PS8"
+author: "Stros"
+date: "12/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r , include=TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+d <-   readRDS ("combined_data.RDS")
+
+head(d)
+library(MatchIt)
+ 
+
+
+```
+#### 1.
+```{r , include=TRUE}
+summary(lm(data= d, pctVV~ treat))
+```
+#### The treatment seems to be large with however quite large SE and very very low R squared. On the upside the p-value is very good.
+
+#### 2.
+```{r , include=TRUE}
+
+ dm <- d %>% filter(male == 1)
+ summary(lm(data = dm, pctVV~ treat))
+ 
+  dw <- d %>% filter(male == 0)
+ summary(lm(data = dw, pctVV~ treat))
+ 
+ summary(lm(data = d, treat~ male))
+
+```
+#### There does seem to be a bias of being selected into the treatment group conditional on being male and the outcomes depending on the sexes singificantly differ. 
+Honestly I was not sure what the question asked whether it was the outcomes given the different sexes or the proclivity of being selected into treatment as a male.
+
+#### 3.
+
+```{r , include=TRUE}
+ summary(lm(data = d, pctVV~ treat + male))
+```
+#### The treatment effect is thus a tiny bit smaller, but the SE stays the same.
+
+
+d_treated <-  d %>% filter(treat == 1)
+d_control <-  d %>% filter(treat == 0)
+
+n <-length(d_treated$male)
+
+d_treated <-  d_treated[,"matched_control_unit_pctVV"] <- NA
+
+for (i in n){
+  gender_treated <- d_treated$male[i]
+  
+  d_control <-  d %>% filter(treat == 0)
+  ## this line feels needed so that I don't have only the gender in d_control defined by previous iteration
+  
+   d_control <- d_control %>% filter(gender_treated == d_control$male )
+   ## the matching
+  
+   d_control <- sample_n( d_control, 1)
+   
+   d_treated[i,"matched_control_unit_pctVV"] <-  d_control$pctVV
+   ## maybe here is a failure in the assignment??
+ 
+  
+     
+}
+d_treated$matched_control_unit_pctVV
+## checking for the results
+
+
+#### 4.
+
+```{r , include=TRUE}
+
+
+d_treated <- d %>% filter(treat==1)
+d_controled <- d %>% filter(treat==0)
+d_treated["matched_control_unit_pctVV"] <- NA
+
+for (i in 1:dim(d_treated)[1]){
+  
+  gender_treated <- d_treated[i,] %>% select(male) %>% as.numeric()
+  
+  matched_unit <- d_controled %>% filter(male==gender_treated) %>% sample_n(1)
+  d_treated[i,"matched_control_unit_pctVV"] <- matched_unit %>% select(pctVV) %>% as.numeric()
+}
+
+
+
+
+
+
+ 
+```
+#### 5. With this matched dataset, we now have balance on gender by definition. To estimate the treatment effect using a difference-in-means calculate the difference in outcomes between your treated and matched control units in the treated units dataset (i.e. between the pctVV and matched_control_unit_pctVV variables). Then average these differences to get an average treatment effect and interpret the result. Also conduct a t-test to get a p-value.
+
+
+```{r , include=TRUE}
+
+new_d <- d_treated %>% mutate(difference_in_outcomes=pctVV-matched_control_unit_pctVV) %>% summarise(diff_outcome=mean(difference_in_outcomes,na.rm=TRUE))
+
+new_d
+
+ t.test(x = d_treated$pctVV,y = d_treated$matched_control_unit_pctVV)$p.value 
+```
+
+### 6.
+```{r , include=TRUE}
+ d6 <- d_treated %>% select(pctVV, matched_control_unit_pctVV)
+d6 <- d6 %>% gather(key = "Treatment",value="pctVV_all")
+d6 <- d6 %>% mutate(Treatment = ifelse(Treatment == "pctVV", 1, 0) )
+summary(lm(data = d6,  pctVV_all ~ Treatment))
+
+
+
+```
+It is very similar, albeit we get p-value above 0.05
+
+
+### 7.
+```{r , include=TRUE}
+output <- matchit(treat ~ log.valid.votes, data = d)
+summary(output)
+```
+the question's suggested "output$nn" returned "NULL"
+
+### 8.
+```{r , include=TRUE}
+
+diff_original <- mean(d_treated$log.valid.votes) - mean(d_controled$log.valid.votes) 
+diff_original
+diff_matched_c <- match.data(output) %>% filter(treat == 0) 
+diff_matched_t <- match.data(output) %>% filter(treat == 1) 
+
+mean(diff_matched_t$log.valid.votes) - 
+mean(diff_matched_c$log.valid.votes)
+```
+ 
+ 
+### 9.
+```{r , include=TRUE}
+d %>% ggplot() + geom_point(aes(x=log.valid.votes,y=pctVV,color=factor(treat)), shape = 2, alpha=0.2) +
+  geom_point(data=match.data(output),aes(x=log.valid.votes,y=pctVV,color=factor(treat)))
+
+```
+### 10.
+```{r , include=TRUE}
+ summary(lm(data = match.data(output), pctVV ~ treat))
+```
+There seems to be a strong impact of 22.6%, but the p-value is too large and the adjusted R-squared is way too small.
+### 11. Conduct the same regression as in Q8 but add a control for log.valid.votes, the variable we already matched on. Does this change the estimate of the treatment effect compared to your answer in Q8? Why/why not?
+```{r , include=TRUE}
+ summary(lm(data = match.data(output), pctVV ~ treat + log.valid.votes))
+
+```
+Question 8. was not a regression so I guess it was referring to question 10. Anyway there is basically no difference in the coefficient but there is much better p-value.
+### 12.
+```{r , include=TRUE}
+covars <- c("occBlue.collar", "occEducation", "occGovernment", "occMedia", "occNone", "occOther", "occPolitician", "occWhite.collar", "lat", "long", "ran.prior", "incumbent", "log.valid.votes", "party.prior.pctVV", "prior.pctVV", "elec.year", "match.partyPCB", "match.partyPC.do.B", "match.partyPDT", "match.partyPFL", "match.partyPL", "match.partyPMDB", "match.partyPMN", "match.partyPP", "match.partyPPS", "match.partyPSB", "match.partyPSC", "match.partyPSDB", "match.partyPSDC", "match.partyPSL", "match.partyPT", "match.partyPTB", "match.partyPV", "uf.rs", "uf.sp", "yob", "eduMore.than.Primary..Less.than.Superior", "eduSome.Superior.or.More", "log.total.assets", "pt_pres_1998", "psdb_2000", "hdi_2000", "income_2000", "log.num.apps")
+
+covars_formula <- paste0(covars,collapse=" + ")
+matched_data <- matchit(as.formula(paste0("treat~",covars_formula)), data=d,method="nearest")
+```
+### 13.
+```{r , include=TRUE}
+treat_sds <- d %>% filter(treat==1) %>% summarise_at(covars,sd)
+
+fulldata_mean_diff <- d %>% group_by(treat) %>% summarise_at(covars,mean) %>% summarise_all(diff) %>% select(-treat)
+fulldata_mean_diff_std <- (fulldata_mean_diff/treat_sds)*100 
+fulldata_mean_diff_std <- fulldata_mean_diff_std %>% gather()
+
+fulldata_p <- d %>%  summarise_at(covars,funs(t.test(.[treat==0], .[treat==1])$p.value)) %>% gather()
+
+final <- match.data(matched_data)
+
+treat_sds_matched <- final %>% filter(treat==1) %>% summarise_at(covars,sd)
+
+matcheddata_mean_diff <- final %>% group_by(treat) %>% summarise_at(covars,mean) %>% summarise_all(diff) %>% dplyr::select(-treat)
+matcheddata_mean_diff_std <- (matcheddata_mean_diff/treat_sds_matched)*100
+matcheddata_mean_diff_std <- matcheddata_mean_diff_std %>% gather()
+
+matched_p <- final %>% summarise_at(covars,funs(t.test(.[treat==0], .[treat==1])$p.value)) %>% gather()
+
+fulldata_mean_diff_std %>% left_join(matcheddata_mean_diff_std, by=c("key")) %>% 
+  left_join(fulldata_p,by=c("key")) %>%
+  left_join(matched_p,by=c("key")) %>%
+  dplyr::rename(Before_Mean=value.x, After_Mean=value.y, Before_p=value.x.x, After_p=value.y.y) %>% 
+  mutate_at(vars(Before_Mean,After_Mean,Before_p,After_p),funs(round(.,3)))
+```
+### 14.
+
+```{r , include=TRUE}
+lm(pctVV ~ treat, data = final)
+```
+### 15.
+```{r , include=TRUE}
+
+
+d_15 <- matchit(as.formula(paste0("treat~",covars_formula)), data=d,method="nearest", caliper = 0.01)
+
+df <- match.data(d_15)
+
+lm(pctVV ~ treat, data = df)
+
+```
+### 16.
+```{r , include=TRUE, cache=TRUE}
+library(rgenoud)
+library(Matching)
+data_16 <- matchit(as.formula(paste0("treat~",covars_formula)), data=d,method="genetic") %>% match.data()
+lm(pctVV ~ treat, data = data_16 )
+```
+### 17.
+I dont really know. Any variable that is not included in covars. Perhaps flu wave could influence both the treatment assignment and the pctVV variable.

@@ -1,0 +1,117 @@
+---
+title: "PS6"
+author: "Stros"
+date: "12/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### 1. 
+```{r , include=TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+d <-   read.csv ("olken.csv")
+
+d
+
+ 
+
+
+```
+Treatment status is given by treat.invite, which takes a value of 1 if the village received the intervention and 0 if it did not. There are four pre-treatment covariates in the data: head.edu, the education of the village head; mosques, mosques per 1,000 residents; pct.poor, the percentage of households below the poverty line; and total.budget, the budget for each project.
+
+### a)
+```{r , include=TRUE}
+
+  
+
+
+
+d_t <- d %>% filter(treat_invite == 1)
+bt <- d_t %>%
+  summarise(mean(mosques), sd(mosques), mean(pct_poor), sd(pct_poor), mean(total_budget), sd(total_budget))
+
+
+d_c <- d %>% filter(treat_invite == 0)
+
+bc <- d_c %>%
+  summarise(mean(mosques), sd(mosques), mean(pct_poor), sd(pct_poor), mean(total_budget), sd(total_budget))
+balance <- full_join(bt, bc)
+balance
+
+t.test(x = d_t, y = d_c, alternative = "two.sided" )
+
+```
+b)
+```{r , include=TRUE}
+d_t %>% ggplot( aes(x = d_t$mosque )) + geom_histogram()
+d_c %>% ggplot( aes(x = d_c$mosque )) + geom_histogram()
+
+d_t %>% ggplot( aes(x = d_t$pct_poor )) + geom_histogram()
+d_c %>% ggplot( aes(x = d_c$pct_poor )) + geom_histogram()
+
+d_t %>% ggplot( aes(x = d_t$total_budget )) + geom_histogram()
+d_c %>% ggplot( aes(x = d_c$total_budget )) + geom_histogram()
+
+d_t %>% ggplot( aes(x = d_t$head_edu )) + geom_histogram()
+d_c %>% ggplot( aes(x = d_c$head_edu )) + geom_histogram()
+
+```
+#### The villages seem on some counts similar on some not. In the  balance test the means seemed pretty similar except for minor difference in greater poverty on the case of the control group. With the standard deviations the only significant difference albeit strong one was the smaller sd of total_budget in case of the control group.The t-test was inconclusive with p-value 0.7, but it suggested very low to no difference.
+
+#### The graphs suggest mainly similarities albeit the scale of the unequally large groups can seem to obfuscate the similarities.
+
+#### The point of checking for balance is too see whethe rthe control and treatment groups are not different regardless of treatment. Without balance check we could mistakenly attribute post-treatment differences to the treatment while they should be attributed to the group differences.
+
+### d)
+```{r , include=TRUE}
+lm(data = d, pct_missing ~ mosques + head_edu + pct_poor + total_budget)
+```
+I am not quite sure how to interpret these findings. Total_budget seems to small to be relevant. The rest however seems to lower the pct_missing strongest of these is the poverty which may support the idea that self-governance /  community could weed out corruption.
+### e)
+```{r , include=TRUE}
+mean(d_t$pct_missing) - mean(d_c$pct_missing)
+sd(d$pct_missing)
+```
+### f)
+```{r , include=TRUE}
+summary(lm(data = d, pct_missing ~ treat_invite))
+```
+They match very strongly. The ATE matches exactly, but the sd is a bit off. I dont actually know how to make the sds closer to one another without removing data thereby tempering with the closely matched ATEs.
+
+
+```{r , include=TRUE}
+summary(lm(data = d, pct_missing ~ treat_invite+ mosques + head_edu + pct_poor + total_budget))
+```
+
+```{r , include=TRUE}
+library(MatchIt)
+summary(matchit(data = d, treat_invite ~ pct_missing + head_edu + pct_poor + total_budget , method = "nearest"))
+```
+I am not sure how to interpret since the treatinvite is the outcome variable; whereas in the previous exmaples it was the independent variable predicting the outcome
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```
+
+```{r , include=TRUE}
+
+```

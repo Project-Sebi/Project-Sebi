@@ -1,0 +1,215 @@
+---
+title: "PS5"
+author: "Stros"
+date: "11/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r , include=TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(dslabs)
+library(tidyverse)
+data(heights)
+data(murders)
+rm(list = ls())
+getwd()
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readxl)
+
+  library(stargazer)
+  filename <- "d2000.csv"
+
+fullpath <- file.path(filename)
+fullpath
+dir <- system.file(p) 
+
+file.copy(fullpath, filename)
+d0 <- read.csv(fullpath)
+ 
+ filename <- "d2004.csv"
+
+fullpath <- file.path(filename)
+fullpath
+dir <- system.file(p) 
+
+file.copy(fullpath, filename)
+d4 <- read.csv(fullpath)
+
+
+```
+### 2.
+#### a.
+
+```{r , include=TRUE}
+d0 <- d0 %>% filter( NUM_TURNO == 1) %>%
+  select(COD_MUN_IBGE, SIGLA_PARTIDO, QTDE_VOTOS) %>%
+  group_by(COD_MUN_IBGE)%>%
+  mutate(vote_pct_2000 = QTDE_VOTOS/ sum(QTDE_VOTOS), 
+         Electorate = sum(QTDE_VOTOS)) 
+
+d0 <-  d0 %>% mutate(Rank = rank(-QTDE_VOTOS))
+d0
+
+
+
+
+ 
+```
+#### b.
+
+
+```{r , include=TRUE}
+
+
+d0 <- d0 %>% arrange(COD_MUN_IBGE, Rank) %>% 
+  mutate(Highest = max(vote_pct_2000) )  %>%
+  mutate(Second = nth(vote_pct_2000,2))
+
+
+                                                       
+
+d0
+```
+#### c.
+
+```{r , include=TRUE}
+
+d0 <- d0 %>% mutate(win_margin=ifelse(Rank==1,vote_pct_2000-Second,vote_pct_2000-Highest))
+
+
+
+```
+
+#### d.
+```{r , include=TRUE}
+
+d0 <- d0 %>% mutate(Incumbent = 
+                      ifelse(QTDE_VOTOS == Highest, 1, 0))
+d0
+```
+### 3.
+
+```{r , include=TRUE}
+d4 <- d4 %>% filter( NUM_TURNO == 1) %>%
+  select(COD_MUN_IBGE, SIGLA_PARTIDO, QTDE_VOTOS) %>%
+  group_by(COD_MUN_IBGE)%>%
+  mutate(vote_pct_2004 = QTDE_VOTOS/ sum(QTDE_VOTOS),
+         Electorate = sum(QTDE_VOTOS)) 
+d4
+```
+
+```{r , include=TRUE}
+results1 <- d0 %>% filter( SIGLA_PARTIDO == "PMDB")
+results2 <- d4 %>% filter( SIGLA_PARTIDO == "PMDB")
+
+results_PMDB <- results1 %>% left_join (results2, by = c("COD_MUN_IBGE", "SIGLA_PARTIDO"))
+results_PMDB
+```
+#### There are less rows than before. 2,648
+### 5.
+
+```{r , include=TRUE}
+ lm(results_PMDB$vote_pct_2004 ~ results_PMDB$Incumbent)
+
+```
+#### 6.
+
+
+```{r , include=TRUE}
+
+
+
+cutoff<- results_PMDB %>% filter(win_margin<0.05 & win_margin>-0.05)
+cutoff
+
+cutoff %>% 
+  group_by(Incumbent) %>% 
+  summarise(Electorate=mean(Electorate.x)) 
+
+
+
+
+  
+
+```
+### 7.
+
+```{r , include=TRUE}
+library(rdd)
+
+DCdensity(results_PMDB$win_margin, verbose = TRUE)
+
+```
+Honestly, I don't really know what this means except for the p-value which is over 0.05 which leads to failur of rejecting the null hypothesis.
+
+```{r , include=TRUE}
+results_PMDB
+
+ggplot() + geom_point(data=results_PMDB,aes(x=win_margin,y=vote_pct_2004))  + geom_smooth(data=results_PMDB[results_PMDB$win_margin<0,],aes(x=win_margin,y=vote_pct_2004),method="lm")  + geom_smooth(data=results_PMDB[results_PMDB$win_margin>0,],aes(x=win_margin,y=vote_pct_2004),method="lm") + geom_vline(aes(xintercept=0),col="red",size=1)
+
+ggplot() + geom_point(data=results_PMDB,aes(x=win_margin,y=vote_pct_2004)) + geom_smooth(data=results_PMDB[results_PMDB$win_margin<0,],aes(x=win_margin,y=vote_pct_2004),method="loess")  + geom_smooth(data=results_PMDB[results_PMDB$win_margin>0,],aes(x=win_margin,y=vote_pct_2004),method="loess") +
+geom_vline(aes(xintercept=0),col="red",size=1)
+
+```
+#### The cutoff Incumbancy (ie. just winning) predicts greater chance of losing in the next elections.
+### 9.
+```{r , include=TRUE}
+
+
+```
+### 10. I dont know why the the mean method cannot be applied on the vote_pct_2004. It says it must be numeric or logical and that vote_pct_2004 is not either, but to me it seems like a column of numerics. I thought that the problem is caused by the NAs so I included the na.pass() so that the NAs are skipped but it seems to be of futile.
+```{r , include=TRUE}
+bandwidth <- 0.03
+ 
+mean1<- results_PMDB %>% filter(win_margin<bandwidth) %>% mean(vote_pct_2004,na.rm=TRUE)
+mean2 <- results_PMDB %>% filter(win_margin>bandwidth ) %>% mean(vote_pct_2004, na.rm=TRUE)
+
+diff_means <- abs(mean1-mean2)
+```
+### 11.
+
+```{r , include=TRUE}
+lm(vote_pct_2004~win_margin+Incumbent + I(win_margin^2) + I(win_margin^3),data=results_PMDB)
+
+```
+### 12.
+
+```{r , include=TRUE}
+ lm(vote_pct_2004~win_margin+Incumbent,data=results_PMDB)
+```
+```{r , include=TRUE}
+bandwidth <- 0.05
+ filtered <- results_PMDB %>% filter(win_margin<bandwidth & win_margin>-bandwidth)
+
+ lm(vote_pct_2004~win_margin+Incumbent,data=filtered)
+```
+There is fairly high negative coefficient for win_margin. This suggests that in the smaller bandwidth being Incumbent predicts worse success
+### 14.
+```{r , include=TRUE}
+REstimate <- RDestimate(vote_pct_2004 ~ win_margin, data=results_PMDB, cutpoint=0)
+
+REstimate$est
+
+REstimate$p
+
+```
+There seems to be a consistent negative effect of win_margin on vote success in 2004; however the negative effect slightly fluctuates depending on the bandwidth. The p-values are small enough so that we can reject the null hypothesis.
+
+
+```{r , include=TRUE}
+ lm(vote_pct_2004~win_margin+Incumbent,data=results_PMDB)
+```
+###  16.
+
+I would mention that Incumbency has a negative effect for future elections; however this is supported only by data close to the win/lose cutoff of the first election. Winning 30% in the first elections is too far from the studied data. So, I cannot say anything to him/her for sure.

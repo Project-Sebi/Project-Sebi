@@ -1,0 +1,192 @@
+---
+title: "PS 4"
+author: "Stros"
+date: "11/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## 1.
+### Excercises 7.15
+
+
+```{r , include=TRUE}
+library(dplyr)
+library(ggplot2)
+library(dslabs)
+library(tidyverse)
+data(heights)
+data(murders)
+rm(list = ls())
+getwd()
+setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+
+  library(stargazer)
+ data(CigarettesSW)
+cigs <- CigarettesSW
+head(cigs)
+```
+#### 1.
+OLS:
+
+
+
+```{r , include=TRUE}
+p <- murders %>% ggplot()
+class(p)
+
+```
+
+#### 2. b.
+
+```{r , include=TRUE}
+p
+```
+#### 3.
+```{r , include=TRUE}
+p <- heights %>% ggplot()
+```
+#### 4.
+```{r , include=TRUE}
+class(p)
+```
+#### 5. c.
+```{r , include=TRUE}
+head(murders)
+```
+#### 6. 
+```{r , include=TRUE}
+murders %>% ggplot(aes(x = population / 10 ^ 6, y = total)) +
+  geom_point()
+
+```
+#### 7.
+
+```{r , include=TRUE}
+murders %>% ggplot(aes(total, population)) +
+  geom_point()
+
+
+```
+#### 8. a.
+#### 9.
+
+```{r , include=TRUE}
+murders %>% ggplot(aes(population, total)) + geom_label(aes(label =abb))
+```
+#### 10. d.
+#### 11.
+
+```{r , include=TRUE}
+murders %>% ggplot(aes(population, total)) + geom_label(aes(label =abb, ), color = "blue") 
+```
+#### 12.c.
+#### 13.
+
+```{r , include=TRUE}
+p <- murders %>% 
+  ggplot(aes(population, total, label = abb, color = region)) +
+  geom_label() 
+p
+
+```
+#### 14.
+
+
+``` {r , include=TRUE}
+p <- murders %>% 
+  ggplot(aes(population, total, label = abb, color = region)) +
+  geom_label() + scale_x_log10()
+p
+```
+#### 15.
+
+```{r , include=TRUE}
+p <- murders %>% 
+  ggplot(aes(population, total, label = abb, color = region)) +
+  geom_label() + scale_x_log10() + scale_y_log10()
+p
+```
+```{r , include=TRUE}
+p <- murders %>% 
+  ggplot(aes(population, total, label = abb, color = region)) +
+  geom_label() + scale_x_log10() + scale_y_log10() + ggtitle("Gun murder data")
+p
+```
+## Problem 2
+(a) The thought here is that that instrumental variable of mortatlity rate predicts the likelihood of recieving the treatment of modern property rights. The property rights then should predict higher GDP per capita. The confounder Ui that influences both treatment and ouctome should not worry us as long as the instrumental variable is not also influenced by the confounder. In fact, it is precisely the reason why we use the Zi to bypass the confounders of Di and Yi or selection bias for/against recieving the treatment.
+
+(b) Zi has causal effect on Di E[Di(1) - Di(0)] != 0
+where the estimated Dis are estimated by Zi.
+
+instrumental variable is relevant for the prediction of being assigned to treatement: being a higher-murder-rate colonized country will lead to being assigned to the treatment of modern institutions. This makes sense as the more colonization probably did take effect by increasing the murder rate but also leading to modern institutions
+
+{Yi(1), Yi(0), Di(1), Di(0)} [the upside down T] Zi
+the Zi muder-rate is randomly or as in randomly assigned. This may be problematic as it may be that some let's say less submissive peoples fought the colonization more leading to higher murder rate and non-random Zi assignment
+
+Yi(1, d) = Yi(0, d) for d = 0, 1
+The instrument muder rate affects the log GDP per capita only through the modern istitutions. This is disputable as higher murder rate could kill off all hard-working people while we hold the modern institutions constant
+
+D(1) => Di(0) for all i
+there are no defiers ie. higher murder does not lead to the absence of modern institutions - monotonicity
+Yi(1, d) = Yi(0, d) for d = 0, 1
+There is zero ITT effect for always-takers and never-takers
+
+
+
+(c)
+Loading the data:
+```{r , include=TRUE}
+filename <- "ajr_data.dta"
+ 
+fullpath <- file.path(filename)
+file.copy(fullpath, "ajr_data.dta")
+dat <- read_dta(filename)
+head(dat)
+
+```
+#### Naive regressions
+```{r , include=TRUE}
+run <- lm(logpgp95 ~ avexpr, data = dat)
+summary(run, vcov = sandwich, df = Inf, diagnostics = TRUE)
+```
+
+```{r , include=TRUE}
+run <- lm(logpgp95 ~ avexpr + lat_abst + africa + asia +logem4, data = dat)
+summary(run, vcov = sandwich, df = Inf, diagnostics = TRUE)
+
+```
+#### In the first analysis both p-values were a under 0.05 which means the results are caused by chance. In the second regression the only p-value over 0.05 is the lat_abst (Absolute value of latitude of capital) which seems reasonable as this should be less important than avexpr.The second analysis should be less biased as it inlcudes more relevant factors and there is a higher correltion as the R's are higher; however both analyses may have their coefficients correlated with something we dont see only via the error term. That is why instrumental variables are useful here.
+(d)
+```{r , include=TRUE}
+run <- lm(logpgp95 ~ logem4, data = dat)
+summary(run, vcov = sandwich, df = Inf, diagnostics = TRUE)
+```
+```{r , include=TRUE}
+run <- lm(logpgp95 ~ logem4 + avexpr + lat_abst + africa + asia, data = dat)
+summary(run, vcov = sandwich, df = Inf, diagnostics = TRUE)
+
+```
+#### The reduced form purports to estimate the influence of the instrumental variable Zi in our case log settler mortality on the outcome Yi which is the log purchasing power parity per capita, 1995.
+Taking into account the other covariates leads to the same output as in the first case of including covariates (I think). I don't see other possible code formulation which would thereby lead to different results. 
+We can take these estimate as causal effect of instrument on the outcome given the five assumptions listed in c
+
+#### (e) Again the p-values are smaller than the 0.05 cutoff so this should mean our results are not due to chance. BUt the R and R-squared are pretty low yet significantly higher in the version with covariates. As for the weak instruments... I dont quite know what should they mean. I think this is where I would need better statistical beckground (I have never taken uni-level stats), but I am sure I will understand the interpreatation durng the seminar.
+```{r , include=TRUE}
+iv1 = ivreg(logpgp95 ~ avexpr | logem4 , data = dat)
+summary(iv1, vcov = sandwich, df = Inf, diagnostics = TRUE)
+  
+```
+
+```{r , include=TRUE}
+iv1 = ivreg(logpgp95 ~ avexpr   | logem4 + lat_abst + africa +asia, data = dat)
+  summary(iv1, vcov = sandwich, df = Inf, diagnostics = TRUE)
+```
