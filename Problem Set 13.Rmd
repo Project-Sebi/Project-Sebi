@@ -1,0 +1,155 @@
+---
+title: "PS12"
+author: "Stros"
+date: "2/4/2022"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+library(ISLR2)
+library(png)
+library(boot)
+library(ISLR)
+library(leaps)
+library(glmnet)
+library(tree)
+
+```
+Create a training set containing a random sample of 800 observations,
+and a test set containing the remaining observations.
+
+
+
+364 8. Tree-Based Methods
+
+
+
+
+
+
+a)
+```{r}
+head(OJ)
+dim(OJ)
+
+set.seed(2)
+training <- sample( 1070, 800)
+
+training.set <- OJ[training, ]
+test.set <- OJ[-training, ]
+dim(training.set)
+dim(test.set)
+```
+
+(b) Fit a tree to the training data, with Purchase as the response and the other variables as predictors. Use the summary() function to produce summary statistics about the tree, and describe the results obtained. What is the training error rate? How many terminal nodes does the tree have?
+
+```{r}
+first.tree <- tree(Purchase ~ . , data = OJ, subset = training)
+summary(first.tree)
+```
+Summary() tells us all we need to know:
+terminal nodes = 9
+training error rate = 0.1588
+
+
+(c) Type in the name of the tree object in order to get a detailed text output. Pick one of the terminal nodes, and interpret the information displayed.
+```{r}
+first.tree
+```
+
+Choosing node 9: 0.17241% of the trained observations are below LoyalCH = 0.035047 
+(d) Create a plot of the tree, and interpret the results.
+```{r}
+plot(first.tree)
+text(first.tree )
+```
+
+(e) Predict the response on the test data, and produce a confusion matrix comparing the test labels to the predicted test labels.What is the test error rate?
+```{r}
+test.prediction <- predict(first.tree, newdata = test.set)
+outcome1 <- rep("MM", 270)
+for(i in 1:270){
+  if(test.prediction[i, 1] > 0.5 ){
+  outcome1[i]<- "CH"
+  }
+}
+
+table(outcome1, test.set$Purchase)
+
+print("Error rate:")
+52/270
+
+```
+
+(f) Apply the cv.tree() function to the training set in order to determine the optimal tree size.
+```{r}
+cv.first.tree <- cv.tree(first.tree, FUN = prune.misclass)
+cv.first.tree
+```
+
+
+(g) Produce a plot with tree size on the x-axis and cross-validatedclassification error rate on the y-axis.
+```{r}
+plot(x= cv.first.tree$size, y=cv.first.tree$dev)
+```
+(h) Which tree size corresponds to the lowest cross-validated classification error rate?
+
+Either 9 or 7 terminal nodes both have 143 cross-validaion errors.
+
+
+(i) Produce a pruned tree corresponding to the optimal tree size obtained using cross-validation. If cross-validation does not lead to selection of a pruned tree, then create a pruned tree with five terminal nodes.
+```{r}
+pruned.tree <-  prune.tree(first.tree, best = 7)
+```
+
+(j) Compare the training error rates between the pruned and unpruned trees. Which is higher?
+```{r}
+summary(first.tree)
+summary(pruned.tree)
+```
+Training error rate is the same only the residual mean deviance changes.
+
+(k) Compare the test error rates between the pruned and unpruned trees. Which is higher?
+```{r}
+test.prediction <- predict(pruned.tree, newdata = test.set)
+outcome <- rep("MM", 270)
+for(i in 1:270){
+  if(test.prediction[i, 1] > 0.5 ){
+  outcome[i]<- "CH"
+  }
+}
+
+print("Pruned Tree:")
+table(outcome, test.set$Purchase)
+
+print("Error rate:")
+52/270
+
+
+cat("\n")
+cat("\n")
+print("Original Tree:")
+table(outcome1, test.set$Purchase)
+
+print("Error rate:")
+52/270
+
+```
+They have the same error rates.

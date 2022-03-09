@@ -1,0 +1,151 @@
+---
+title: "PS9"
+author: "Stros"
+date: "1/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### I am not able to load the picture using the suggested code. I also tried read_graphics() to the same end.
+
+3. b) 
+Variance is growing with flexibility as more complex and thus more flexible model has more turns and changes so as to classify all test data correctky leading to higher variance.
+
+Bias is going down with flexibility as the model picks up any trend no significant simplification such as with linear model occurs.
+
+Training MSE goes down as with more commplex model we classify most or all training data correctly.
+
+Test MSE has U-shape as at the beginning growing flexibility picks up trends in the data but from certain point more complex models pick noise nonexistent trend in the training data leading to more mistakes in test data.
+
+Irreducible Bayes Error stays the same, as the complexity of the model does not influence it.
+
+
+
+7. a) R: 0, -3, 0 Euclidean Distance: 3
+     1. R: -2, 0, 0 E.D.: 2
+     2. R: 0, -1, -3 E.D: sqrt of 10 
+     3. G: 0, -1, -2 E.D.: sqrt of 5
+     4. G: 1, 0, -1 E.D.: sqrt of 2
+     5. R: -1, -1, -1 E.D.: sqrt of 3
+    
+  b)  As it is closest to Green (euclidean distance of sqrt of 2) it would be classified as green
+  
+  c) 2/3 are Red of the KNN so it would be classified as Red
+  d) small, because imposing small KNN will pickup more variance but with highly non-linear model we fear more bias and we are unlikely to get that with small K
+  
+Chapter 5, Ex. 3  
+
+a) K-fold cross-validation puts data into k number of groups. One group is hold out for testing while the others are used as training data. Once the model trains on the k-1 groups the one group is used as a testing data. Then, a new group is selected and the previously holdout data are used as a training group. This process reiterates until all groups are used as the holdout data.
+
+b) i. The validation set approach splits the data into two sets which can create problems because it then becomes important what data were used as training data and what data were used as test data. Suppose that due to random chance the subset of the test data correlate each other, but this correlation does not take place within the whole set. Then the validation approach will be overfitte and will pick up this noise, hence it will do terribly with the test set. In comparison, K-fold model will not be overfitted as no data is actually left out of the training. All data will be used eventually, so if the correlation is only within a subset, it won't be seen in the final model as this noise will be silence by the other correlation-less data
+  ii. LOOCV is perhaps even better in making the model more accurate as the held-out data is just one point and so we train the model on all the data except that one point (I am not sure about this claim). Definetily there will be no noise picked up as the subset of training data includes basically all data. However, its disadvatage is that the process is computationally demanding: always fitting the model on all-1 data then testing it against 1 point, finally repeating the process with all the data points 
+
+
+
+```{r , include=TRUE}
+library(ISLR2)
+library(boot)
+library(dplyr)
+ 
+
+
+```
+### 10. a)
+```{r , include=TRUE}
+?Boston
+```
+506 rows (housing values in 506 Boston suburbs), 13 columns (variables such as crime rate, proportion of residential zone)
+
+b)
+```{r , include=TRUE}
+head(Boston)
+pairs(~crim+ zn+ chas + rm + age , data = Boston)
+pairs(~crim+ dis+ tax + ptratio , data = Boston)
+pairs(~crim+ rad+ lstat + medv , data = Boston)
+```
+c) There seem to be four worth mentioning findings. There is higher crime rate in small to middle large house as the pair scatteplor betwen crime rate and rooms suggests. There is even some suggestion of 5-6 rooms house being correlated with the highest crime rates. Secondly, higher crime rates tend to be in areas with higher proportion ofowner-occupied houses built prior to 1940 as corr. between 'crim' and 'age' suggest. Thirdly, larger distance 'dis' from the five Boston employment centres is also a predictor of a higher crime rate. Lastly, lower median value of owner-occupied homes in $1000s is also a predictor of higher crime rate.S
+
+d) Yes, both x = tax, y = crim  and x = ptratio, y = crim predic at near the highest values of x very high values of y. Interestnigly, for one x value there are many y values. I am not sure what this means yet.
+
+
+e)
+```{r , include=TRUE}
+river_tracts <- Boston %>% filter(chas == 1) 
+dim(river_tracts)[1]
+```
+f)
+```{r , include=TRUE}
+median(river_tracts$ptratio)
+```
+g)
+```{r , include=TRUE}
+k <- min(Boston$medv)
+Boston[Boston$medv == 5,]
+```
+The crime rate is clearly very high in both tracts though nearly twice higher in tract n. 406.There is also higher ptratio; however maybe surprisingly both tracts farily close to employment centres as low dis shows.
+
+h)
+```{r , include=TRUE}
+above_7 <- Boston %>% filter(rm > 7)
+dim(above_7)[1]
+above_8 <- Boston %>% filter(rm > 8)
+dim(above_8)[1]
+```
+It is pretty rare to have more than 7 rooms.
+
+```{r , include=TRUE}
+
+set.seed (1)
+x <- rnorm (100)
+y <- x - 2 * x^2 + rnorm (100)
+
+```
+n = 100
+p = 2
+
+```{r , include=TRUE}
+
+plot (x,y)
+```
+```{r , include=TRUE}
+set.seed (17)
+x <- sample(x = 1:100, size  = 30)
+y <- x 
+d <- data.frame(x = x, y = y)
+cv.error.4 <- rep(0, 4)
+
+for (i in 1:4) {
+glm.fit <- glm(y ∼ poly(x , degree= i), data=d)
+
+cv.error.4[i] <- cv.glm(d , glm.fit , K = 10)$delta [1]
+}
+cv.error.4
+
+
+
+
+```
+
+
+```{r , include=TRUE}
+set.seed (7)
+x <- sample(x = 1:100, size  = 30)
+y <- x 
+d <- data.frame(x = x, y = y)
+cv.error.4 <- rep(0, 4)
+
+for (i in 1:4) {
+glm.fit <- glm(y ∼ poly(x , degree= i), data=d)
+cv.error.4[i] <- cv.glm(d , glm.fit , K = 10)$delta [1]
+}
+cv.error.4
+
+
+```
+The results are not the same as the seed function creates a different enviroment ofr random data generation leading to different random data
+
+e) The smallest LOOCV error is for the quadratic equation which is not smething I expected. I did not expect anything really

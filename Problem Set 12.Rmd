@@ -1,0 +1,174 @@
+---
+title: "PS 11"
+author: "Stros"
+date: "1/29/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+library(ISLR2)
+library(png)
+library(boot)
+library(ISLR)
+library(leaps)
+library(glmnet)
+
+```
+
+Chapter 6 ex. 3 
+a)
+iv - The initial decreas of RSS is due to increase of fitting the model to the training data. With zero s the coefficient is non-existent and the model only fits the intercept. With low s the model fits the data much better than just with a mere intercept, hence lowering training RSS. With very large s we end up overfitting the model to the training data, but this will lead to very low RSS albeit the test RSS will mostly likely start increasing as we pick up noise.
+
+b)
+ii - decrease because better fitting data, increase resulting in U-shape due to overfitting to training data ie. picking up the noise
+
+c) 
+iii - higher s will lead to stronger coefficient which will be fitted to the data evetually resulting in overfitting and higher variance
+
+d)
+iv - the mere intercept model (s = 0) will have large bias as too simple model is fit to more complex data. With rising s there will be more complex model implemented which will result in lower bias.
+
+e) 
+v - the irreducible error is not influenced by the models complexity
+
+
+ex. 4
+a)
+iii - The model with no penalty (lamda = 0) will overfit the training data so increasing the penalty should lead to better fit for test data but worse fit for training data ie. traing RSS
+
+b)
+ii - as the original (lamda = 0) model is overfitted to the training data and picks up noise, the same model will be pretty bad for test data; hence increasing the penality will initially lead to less overfitting and thus better performance on test RSS. However with high lambda the model will have too high bias and will not pick up the trends in the training data that are also in the test data hence the test RSS will start increasing resulting in U-shape.
+
+c)
+iv - as with lamda = 0 the model is overfitted it picks up noise in test data resulting in high variance. Increasing lamda will lead to smaller coefficients which are less overfitted resulting in lower variance.
+
+d)
+iii - the lamda = 0 model will be overfitted which will result in small variance. Increasing the penalty will lead to simpler and thus more biased model.
+
+e)
+v - the irreducible error is not influenced by the models complexity
+
+BEST SUBSET SELECTION
+```{r , include=TRUE}
+
+regfit.full <- regsubsets(crim ∼ ., Boston)
+summary(regfit.full)
+
+
+```
+
+
+```{r , include=TRUE}
+reg.summary <- summary(regfit.full)
+reg.summary$rsq
+reg.summary$bic
+reg.summary$rss
+```
+Some things are confirmed accross, for example the lowest RSS for the last coefficient is the same as the highest R^2 also falling on the last coefficient.
+
+
+RIDGE REGRESSION:
+```{r , include=TRUE}
+
+
+
+x <- model.matrix(crim ∼ ., Boston)[, -1]
+                  
+y <- Boston$crim
+grid <- 10^seq(10, -2, length = 100)
+ridge.mod <- glmnet(x, y, alpha = 0, lambda = grid)
+
+
+ridge.mod$lambda[50]
+coef(ridge.mod)[, 50]
+
+
+ridge.mod$lambda[87]
+coef(ridge.mod)[, 87]
+
+ridge.mod$lambda[80]
+coef(ridge.mod)[, 80]
+
+
+
+```
+The strong predictors despite some penalty (0.3765) are nox, rm, rad, dis, chas. Strangely enough the minus sign switches with different lamdas such as in the case of nox, which is pretty strongly negative with small lamda and slightly positive wityh large lamda. But maybe the lamda in this case is so large it should not be even considered.
+
+
+LASSO REGRESSION:
+```{r , include=TRUE}
+x <- model.matrix(crim ∼ ., Boston)[, -1]
+                  
+y <- Boston$crim
+grid <- 10^seq(10, -2, length = 100)
+ridge.mod <- glmnet(x, y, alpha = 1, lambda = grid)
+
+ridge.mod$lambda[89]
+coef(ridge.mod)[, 89]
+
+ridge.mod$lambda[78]
+coef(ridge.mod)[, 78]
+```
+
+
+
+
+
+
+
+```{r , include=TRUE}
+library(pls)
+pcr.fit <- pcr(crim ~ ., data = Boston , scale = TRUE ,
+validation = "CV")
+summary(pcr.fit)
+validationplot(pcr.fit , val.type = "MSEP")
+```
+Seems that going over 3 predictors is unnencessary, or maybe 7, but 7 already feels too much. Perhpas it is worth checking interaction effects and collinearity in th 7-predictor model.
+
+
+b)
+```{r , include=TRUE}
+ k <- 1:20
+for(i in 1:20){
+  
+  dim(Boston)
+  train <- sample(506, 430)
+  lm.fit <- lm(crim ~ rad + lstat + dis, data = Boston, subset = train)
+  attach(Boston)
+ k[i] <- mean((crim - predict(lm.fit, Boston))[-train]^2)
+}
+
+mean(k)
+```
+```{r , include=TRUE}
+ k <- 1:20
+for(i in 1:20){
+  detach("Boston")
+  dim(Boston)
+  train <- sample(506, 430)
+  lm.fit <- lm(crim ~ rad + lstat + dis + medv , data = Boston, subset = train)
+  attach(Boston)
+  k [i] <-mean((crim - predict(lm.fit, Boston))[-train]^2)
+}
+mean(k)
+```
+
+
+
+c) Since all best subsest, lasso, ridge propose rad I use rad. Lstat is proposed by best subset and both lasso and ridge give it some credit. Both lasso and ridge show some significance of dis and the dis the 4th selected by best subset. I am going with these three as the PCR validationplot showed the biggest drop after three. I added a second model with medv which was chosen by best subset as 3rd coefficient and lasso also suggested some power to it. I ran the models 20 times and I got some improvement (circa 7 points) for the model with medv. I am undecided whether to stick with 3 or move on to 4-predictor model.

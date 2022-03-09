@@ -1,0 +1,190 @@
+---
+title: "PS10"
+author: "Stros"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r , include=TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+
+
+p <- setwd("C:/Users/Sebastian/Desktop/Humbdoldt/ML but political")
+library(AER)
+library(ivpack)
+library(haven)
+library(readr)
+library(stargazer)
+library(cobalt)
+library(ISLR2)
+library(png)
+library(boot)
+library(ISLR)
+
+
+
+
+
+```
+
+
+```{r , include=TRUE}
+head(Boston)
+
+lm.fit1 <- summary(lm(crim ~ zn, data = Boston))
+
+lm.fit2 <- summary(lm(crim ~ indus, data = Boston))
+
+lm.fit3 <- summary(lm(crim ~ chas, data = Boston))
+
+lm.fit4 <- summary(lm(crim ~ nox, data = Boston))
+
+lm.fit5 <- summary(lm(crim ~ rm, data = Boston))
+
+lm.fit6 <- summary(lm(crim ~ age, data = Boston))
+
+lm.fit7 <- summary(lm(crim ~ dis, data = Boston))
+
+lm.fit8 <- summary(lm(crim ~ rad, data = Boston))
+
+lm.fit9 <- summary(lm(crim ~ tax, data = Boston))
+lm.fit10 <- summary(lm(crim ~ ptratio, data = Boston))
+lm.fit11 <- summary(lm(crim ~ lstat, data = Boston))
+lm.fit12 <- summary(lm(crim ~ medv, data = Boston))
+
+
+lm.fit1
+lm.fit2
+lm.fit3
+lm.fit4
+lm.fit5
+lm.fit6
+lm.fit7
+lm.fit8
+lm.fit9
+lm.fit10
+lm.fit11
+lm.fit12
+
+```
+The first regression has good p-value; however, way too week R^2. The same applies for the second regression and mainly third regression. On the other handm, the second regression has a persuasive t-statistic for the coefficient.
+
+Similarily crim ~ nox (4th reg.) has low p-value, low R^2 good t-statistic and high values itself (Estimated Beta-nox is 31). Bellow is the plot of nox on x-axis and crime rate on y-axis. The plot however is a bit unpersuasive of a linear correlation; rather between values of nox 0.6 and 0.7 there is unexpectedly higher crime rate.
+
+The 5th reg. (crim ~ rm) is also unperesuasive: low p-value,  very low R^2, and bad t-statistic for the coefficient.
+
+Similarily 6th reg. (crim ~ age) has low p-vale, low R^2, though decent t-statistic
+
+Similarily 7th reg. (crim ~ dis) has very low p-vale, low R^2, bad t-statistic, and the coefficient itself -1.5509 is nothing much.
+
+Since the 8th reg. (crim ~ rad) has a very low p-value, good t-statistic and not terrible R^2, I plot it bellow. The plot is a bit strange as there are no values for around average rad, but otherwise it looks somewhat persuasively.
+
+Similarily, the 9th reg. (crim ~ tax) has a low p-value, good t-statistic, not terrible R^2, and coeffiecient pretty far from 1. Hence, I plot it bellow. The plot sufferes the same drawbacks as the previous one ie. no around average values of x, but this may indicate that the high crime areas are differing radically in other aspects than crime rate.
+
+The 10th reg. (crim ~ ptratio) has low p-value, good t-statistic, but bad R^2 and the coeeficient is close to 1.
+
+The 11th reg. (crim ~ lstat) has low p-value, good t-statistic, but bad R^2 and the coeeficient is close to 1.
+
+The same applies for the 12th reg. (crim ~ medv).
+
+
+
+
+```{r , include=TRUE}
+plot( x= Boston$nox, y= Boston$crim )
+plot(x= Boston$rad, y = Boston$crim)
+plot(x  = Boston$tax, y = Boston$crim)
+```
+b)
+
+```{r , include=TRUE}
+b <- summary(lm(crim ~ zn + indus +chas +nox + rm + age + dis + tax +rad  + ptratio + lstat + medv, data = Boston))
+b 
+```
+Since the overall F-statistic is significantly over 1 at least one predictor is associated wite the response. Those associated are probabaly the ones with p-values bellow 0.05 which are zn, dis, rad, medv. Also the intercept is above 0.05 p-value which means... we should not trust it?
+
+
+
+c) 
+```{r , include=TRUE}
+k <- 1:12
+
+
+
+k[1] <- lm.fit1$coefficients[2, 1]
+k[2] <- lm.fit2$coefficients[2, 1]
+k[3] <- lm.fit3$coefficients[2, 1]
+k[4] <- lm.fit4$coefficients[2, 1]
+k[5] <- lm.fit5$coefficients[2, 1]
+k[6] <- lm.fit6$coefficients[2, 1]
+k[7] <- lm.fit7$coefficients[2, 1]
+k[8] <- lm.fit8$coefficients[2, 1]
+k[9] <- lm.fit9$coefficients[2, 1]
+k[10] <- lm.fit10$coefficients[2, 1]
+k[11] <- lm.fit11$coefficients[2, 1]
+k[12] <- lm.fit12$coefficients[2, 1]
+
+k
+
+l <- b$coefficients[2:13, 1]  
+l
+
+
+
+df <- data.frame(k,l)
+df  %>% ggplot() + geom_point(aes(x=k, y=0)) + geom_point(aes(x=0, y=l))
+                             
+
+```
+I wanted to use the following code:
+for (i in k){
+  k[i] <- lm.fit[i]$coefficients[2, 1]
+}
+
+But lm.fit[i] would be a subsetting of function which is not what I wanted to do, but it is something that throws error. I wanted was to loop through lm.fit1 to lm.fit12.
+
+
+
+```{r , include=TRUE}
+
+```
+nams <- b$coefficients[2:13 , 0]
+nams
+ 
+
+current_n <- Boston %>% select(nams[3, 0])
+class(current_n)
+print(current_n)
+for (i in 1:12) {
+  rlang::last_error()
+  current_n <- Boston %>% select( nams[i, 0])
+  
+ 
+ summary(lm(crim ~  nams[i, 0] + I( nams[i, 0]^2) + I( nams[i, 0]^3), data = Boston, ))
+}
+
+I am not quite sure why this does not work. 'nams' prints the correct coefficients which are Boston variables - 'crim' but when I want to access a specific value by
+
+nams[3, 0]
+
+and then use it for
+
+current_n <- Boston %>% select(nams[3, 0])
+class(current_n)
+print(current_n)
+
+I get an empty data.frame of the correct length.
+
+
+
+
