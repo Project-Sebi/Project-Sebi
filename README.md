@@ -5,9 +5,10 @@
 - 💞️ I’m looking to collaborate on Machine Learning projects and learn ML methods thoroughly.
 - 📫 How to reach me: stros.seb@gmail.com
 
- Completed Projects:
+ COMPLETED PROJECTS:
 
 Causal Inference and Machine Learning for Politics - Module at Humboldt University, programming in R
+Each week one problem set. Problem sets are uploaded here at my github
 
 - First half of the module focused on Causal Inference methods such as Difference-in-Differences, Instrumental Variables, Interaction Effects, Reggression Discontinuity Design.
 - Second half of the module focused on Machine Learning methods such as dimension reduction for OLS reggression (Lasso and Ridge Reggressions), Logistic Reggression, Tree-based methods (bagging, boosting, random forests), Support Vector Machines (theory only), Deep Learning (Theory only). 
@@ -19,15 +20,21 @@ Causal Inference and Machine Learning for Politics - Module at Humboldt Universi
 - PS 6 is a simplified replication of a 2012 Diff-in-Diff paper Commodity Price Shocks and Civil Conflict: Evidence from Colombia by Dube and Vargas
 - PS 7 uses Matching method between similar treated and control subjects
 - PS 8 uses interaction effects and Mathing methods
-- Problem Set 9 was introduction to Machine Learning (bias, variance, K-nearest neighbors)
+
+- PS 9 was introduction to Machine Learning (bias, variance, K-nearest neighbors)
 - PS 10 was regression and classification
 - PS 11 looked at sparse and flexible regressions (lasso, ridge, smoothing by derivation)
 - PS 12 was introduction to decision tress
 
 CodeAcademy course, Exploratory Data Analysis in Python
 pandas, numpy, matplotlib, seaborn
-data cleaning: 
+corresponding files: Data Cleaning in Python, Data Visualization in Python
 
+WORKING ON:
+
+CodeAcademy course: Build a Machine Learning Model with Python
+sklearn
+corresponding files: 
 
 
 <!---
