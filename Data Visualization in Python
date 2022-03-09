@@ -1,0 +1,81 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import statsmodels
+import matplotlib.pyplot as plt
+import math
+import codecademylib3
+
+
+## Read in Data
+flight = pd.read_csv("flight.csv")
+print(flight.head())
+
+## Task 1
+print(np.mean(flight.coach_price))
+print(np.median(flight.coach_price))
+sns.histplot(x = 'coach_price' , data =flight )
+plt.show()
+plt.clf()
+
+sns.boxplot(flight.coach_price)
+plt.show()
+plt.clf()
+
+## Task 2
+long_flights = flight.coach_price[flight.hours == 8]
+sns.boxplot(long_flights)
+plt.show()
+plt.clf()
+
+sns.histplot(long_flights)
+plt.show()
+plt.clf()
+## Task 3
+flight2 = flight[ (flight.delay < 450)]
+sns.histplot(flight2.delay)
+plt.show()
+plt.clf()
+
+## Task 
+flight2 = flight.sample(n = int(flight.shape[0]*0.07))
+sns.lmplot(x = "coach_price", y = "firstclass_price", data = flight2, line_kws={'color': 'black'}, lowess=True)
+plt.show()
+plt.clf()
+## Task 5
+sns.boxplot(x = flight.inflight_meal, y = flight.coach_price, data = flight)
+plt.show()
+plt.clf()
+sns.boxplot(x = flight.inflight_entertainment, y = flight.coach_price, data = flight)
+plt.show()
+plt.clf()
+sns.boxplot(x = flight.inflight_wifi, y = flight.coach_price, data = flight)
+plt.show()
+plt.clf()
+
+sns.histplot(flight, x = "coach_price", hue = flight.inflight_meal)
+plt.show()
+plt.clf()
+ 
+## Task 6
+flight2 = flight.sample(n = int(flight.shape[0]*0.01))
+sns.lmplot(x = "hours", y = "passengers", data = flight2, x_jitter = 0.25, scatter_kws={"s": 5, "alpha":0.2}, fit_reg = False)
+
+plt.show()
+plt.clf()
+## Task 7
+
+
+sns.lmplot(x ='coach_price', y='firstclass_price', hue = 'weekend', data = flight2, fit_reg= False)
+plt.show()
+plt.clf()
+ 
+ 
+## Task 8
+sns.boxplot(x = "day_of_week", y = "coach_price", hue = "redeye", data = flight)
+plt.show()
+plt.clf()
+
+
+
+
