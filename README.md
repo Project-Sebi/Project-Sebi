@@ -1,8 +1,8 @@
 - 👋 Hi, I’m @Project-Sebi
 -  I’m a Bachelor student of Philosophy at KCL
-- 👀 In terms of programming, I'm currently interested in data science and machine learning. I am somewhat comfortable with R and I have a bit less experience with Java and Python.
+- 👀 In terms of programming, I'm currently interested in data science and machine learning. I am somewhat comfortable with R and Python I also have experience with Java, but  from a few years back.
 - 🌱 I’m currently learning Machine Learning methods specifically: Tree-based methods, Support Vector Machines and Deep Learning.
-- 💞️ I’m looking to collaborate on Machine Learning projects.
+- 💞️ I’m looking to collaborate on Machine Learning projects and learn ML methods thoroughly.
 - 📫 How to reach me: stros.seb@gmail.com
 
  Completed Projects:
@@ -18,6 +18,10 @@ Causal Inference and Machine Learning for Politics - Module at Humboldt Universi
 - PS 5 is a data cleaning and a simplified replication of 2011 Regression Discontinuity Design paper Incumbency Advantage in Brazil: Evidence from Municipal Mayor Elections by Rocio Titiunik 
 - PS 6 is a simplified replication of a 2012 Diff-in-Diff paper Commodity Price Shocks and Civil Conflict: Evidence from Colombia by Dube and Vargas
 - PS 7
+
+CodeAcademy course, Exploratory Data Analysis in Python
+pandas, numpy, matplotlib, seaborn
+data cleaning: 
 
 
 
