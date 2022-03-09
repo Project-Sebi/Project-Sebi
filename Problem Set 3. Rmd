@@ -1,0 +1,390 @@
+Task:
+Problem Set 3
+Felix Hartmann
+10/11/2021
+1. Read Chapter 4 & 5 (tidyverse) and complete the exercises (except Exercise 5.9): https://rafalab.github.io/dsbook/getting-started.html
+2. Complete Exercises 7, 8, 12 in Chapter 2 of Gerber & Green (2012).
+3. “No causation without manipulation”?
+It is often said that within the potential outcomes framework effects can only be understood empir- ically in relation to causal variables that have been manipulated in some way.
+
+Explain why this notion of manipulation matters so much.
+4. Application: Example Experiment and Limits
+Specify a causal question you would like to study.
+
+How would an ideal randomized experiment look like to answer the question? Define your unit of analysis, binary (0/1) treatment (independent variable), and a continuous or binary outcome variable (dependent variable).
+
+What could be ethical issues when randomly assigning the treatment to participants?
+
+If so, can you think about an actual experiment where you could randomly assign a treatment to study the question or a version/subset of the question (it could be a survey experiment, lab experiment, natural experiment)? If so, define unit of analysis, treatment, and outcome.
+
+Define you quantity of interest. Are interested in the average effect across all participants or are you interested in different subgroups?
+
+How would you recruit participants? Do you have to worry about interference?
+
+
+My completion:
+---
+title: "Problem Set 3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## 4.2 Exercises
+### 1. a.
+
+### 2.b.
+
+### 3. c.
+
+### 4.b, c, d, e, it could be argued that f. is regionally tidy, but taken the matrices together I do not think it is tidy
+
+
+## 4.4
+### 1.
+```{r , inculde = TRUE}
+library(dplyr)
+library(dslabs)
+library(purrr)
+data(murders)
+
+
+
+
+murders <- murders %>% mutate (state, rate = total / population * 100000) %>% mutate(rank = rank(-rate))
+murders
+
+```
+###2.
+```{r , inculde = TRUE}
+
+
+murders <- mutate (murders, rank = rank(-rate))
+murders
+```
+### 3.
+
+```{r , inculde = TRUE}
+
+select(murders, state, abb)
+```
+### 4.
+```{r , inculde = TRUE}
+
+filter(murders, rank <= 5)
+```
+### 5. 
+```{r , inculde = TRUE}
+no_south <- filter(murders, region != "South")
+no_south
+```
+### 6.
+```{r , inculde = TRUE}
+
+murders_nw <- filter(murders, region %in% c("Northeast", "West"))
+murders_nw
+length(murders_nw$state)
+```
+### 7.
+```{r , inculde = TRUE}
+
+
+my_states <- filter(murders, region %in% c("Northeast", "West") & rate < 1)
+```
+## 4.6
+### 1.
+
+```{r , inculde = TRUE}
+
+
+murders %>% 
+  mutate(rate =  total / population * 100000) %>%
+  mutate(rank(-rate)) %>%
+  select(state, rate, rank)
+
+```
+### 2
+Curiosity here, if 'data(murders)' was used in the pipe chain it was of class character and therefore mutate() couldnt be applied on it but class(murders) returned data frame.
+
+Also, according to the github I should have used only three pipes. This would require creating two columns in one mutate which I don't think is possible..?
+```{r , inculde = TRUE}
+library(dslabs)
+data(murders)
+
+
+
+my_states <- murders%>%  mutate( rate =  total / population * 100000) %>% mutate(rank = rank(-rate)) %>% filter(region %in% c("Northeast", "West") & rate < 1) %>%  select(state, rate, rank)
+my_states
+```
+## 4.10
+### 1.
+```{r , inculde = TRUE}
+
+library(NHANES)
+data(NHANES)
+
+
+ref <- NHANES %>% filter(AgeDecade ==  " 20-29") %>% 
+  summarize( average = mean(BPSysAve, na.rm = TRUE),
+             standard_deviation = sd(BPSysAve, na.rm = TRUE))
+ref
+
+
+```
+```{r , inculde = TRUE}
+
+
+ref_avg <- NHANES %>% filter(AgeDecade ==  " 20-29") %>% 
+  summarize( average = mean(BPSysAve, na.rm = TRUE),
+             standard_deviation = sd(BPSysAve, na.rm = TRUE)) %>% 
+  pull(average) 
+ref_avg
+
+```
+```{r , inculde = TRUE}
+
+NHANES %>% 
+  filter(AgeDecade ==  " 20-29") %>%
+  summarize(median_min_max = quantile(BPSysAve, c(0.5, 0, 1), na.rm = TRUE))
+```
+```{r , inculde = TRUE}
+
+NHANES %>% filter(Gender == "female") %>% group_by(AgeDecade) %>% 
+  summarize( average = mean(BPSysAve, na.rm = TRUE),
+             standard_deviation = sd(BPSysAve, na.rm = TRUE)) 
+
+
+```
+```{r , inculde = TRUE}
+
+NHANES %>% filter(Gender == "male") %>% group_by(AgeDecade) %>% 
+  summarize( average = mean(BPSysAve, na.rm = TRUE),
+             standard_deviation = sd(BPSysAve, na.rm = TRUE)) 
+
+
+```
+```{r , inculde = TRUE}
+
+NHANES %>% group_by(AgeDecade, Gender) %>% 
+  summarize( average = mean(BPSysAve, na.rm = TRUE),
+             standard_deviation = sd(BPSysAve, na.rm = TRUE)) 
+
+```
+summarize(median_min_max = quantile(BPSysAve, c(0.5, 0, 1), na.rm = TRUE))
+```{r , inculde = TRUE}
+
+NHANES %>% 
+  filter(AgeDecade ==  " 40-49") %>% 
+  filter(Gender ==  "male") %>%
+  group_by(Race1) %>%
+  arrange(BPSysAve)
+
+
+  
+```
+## 4.15
+### 1. b.
+### 2.
+```{r , inculde = TRUE}
+data(murders)
+murders_tibble<-as_tibble(murders)
+```
+### 3.
+```{r , inculde = TRUE}
+
+group_by(murders, region)
+
+```
+
+
+```{r , inculde = TRUE}
+exp(mean(log(murders$population)))
+
+murders %>%
+  .$population %>%
+  log() %>%
+  mean() %>%
+  exp()
+  
+
+
+
+```
+ Use the map_df to create a data frame with three columns named n, s_n, and s_n_2. The first column should contain the numbers 1 through 100. The second and third columns should each contain the sum of 1 through  
+n
+  with  
+n
+  the row number.
+```{r , inculde = TRUE}
+
+d_f<- tibble(1:100)
+
+n <- 1:100
+
+compute_s_n <- function(n){
+  x <- 1:n
+  tibble(s_n = sum(x))
+}
+compute_s_n_2 <- function(n){
+  x <- 1:n
+  tibble(s_n_2 = sum(x))
+}
+d_f <- mutate(d_f, map_df(n,compute_s_n)) %>% 
+  mutate(map_df(n,compute_s_n_2))
+  d_f
+
+
+```
+## 5.3
+### 1.
+##### I tried to read all the files therefore using also other than read_csv() methods. The pdf I skipped cause that was not explained in the chapter and the .txt makes some problems
+```{r , inculde = TRUE}
+
+system.file(package = "dslabs")
+
+library(tidyverse)
+library(readxl)
+help(read_csv)
+
+
+path <- system.file("extdata", package = "dslabs")
+files <- list.files(path)
+files
+
+
+
+filename <- "2010_bigfive_regents.xls" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_xls(filename)
+
+filename <- "carbon_emissions.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename)
+
+filename <- "fertility-two-countries-example.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename)
+
+filename <- "HRlist2.txt" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_table(filename)
+
+filename <- "life-expectancy-and-fertility-two-countries-example.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename)
+
+filename <- "ssa-death-probability.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename)
+
+
+filename <- "olive.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename)
+
+
+
+
+```
+### 2.
+```{r , inculde = TRUE}
+filename <- "olive.csv" 
+dir <- system.file("extdata", package = "dslabs") 
+fullpath <- file.path(dir, filename)
+file.copy(fullpath, filename)
+dat <- read_csv(filename, skip = 1)
+
+
+```
+### 3.
+```{r , inculde = TRUE}
+
+names(dat) 
+readLines(n=1)
+
+```
+
+## G & G QUESTIONS
+### Ex. 7
+#### a) 
+#### We can call Estimator Unbiased if the mean of our sampling distributuin converges to the true estimate and both SUTVA and ignorability are satisfied
+#### b) 
+#### The procedure in b is unbiased and therefore it is probably a result of chance. 
+#### c)
+#### Since the the treatment allocation is not random, the ignorability assumption is not satisfied. But simply the fact that the procedure is inexpansive  suggests that the treatment outcomes of the two villages will not be representative of other villages sampled where treatment expanses are not different.
+
+### Ex. 8
+#### a. All groups except for the control group were verified with 100% success rate. The control group is calculated below. The median speed is for all the groups equal to 37 days except the Bribe group for which it is 17 days. 
+
+
+```{r , inculde = TRUE}
+20/21
+```
+#### b. 
+```{r , inculde = TRUE}
+bribe_pro <- 24 / 24
+R_pro <- 20 / 23
+N_pro <- 3 /18
+C_pro <- 5 / 20
+c2 <- 5/21
+c3 <- (20/21) * (5/20)
+print("Below are the success rates of getting a ration card given the verified address ")
+sprintf("Bribe = %d", bribe_pro)
+sprintf("RTIA = %f", R_pro)
+sprintf("NGO = %f", N_pro)
+sprintf("Control = %f", C_pro)
+sprintf("if we consider also the unverified the only different outcome will be for control group: %f", c2 )
+
+sprintf("If we take these sucess rates as probablities for getting a ration card, all the results will remain the same ecept for the Control group: %f", c3)
+```
+
+### 12.
+
+#### a. Because of selection bias - the already less violent prisoners are the ones who decide to spend 3 hours reading.
+
+#### b. The excludability assumption may be violated as other things apart from reading may influence the outcomes. This may include the 'specially designated carrels' here the prisoners are secluded. This may give the prisoners some notion of private space which is presumably lacking in prisons. Therefore the prisoners may be less violent becuase their lives become more comfortable. Or the opposite, the other prisoners may consider them privilaged and thereby they will act with greater hostility toward them. Also, the prisoners may miss out on something by not participating with others in their 'usual routines'; this too may affect the outcome.
+
+#### c. The non-interference assumption states that the outcome of the treatment does not depend on the assignment of othe subjects. In this case, violation could be spurred by for example a treated subject encouraging a control subject to read or vis versa. Such interference could take place in room where one control and one treated subjects are allocated.
+
+#### d. Probably the researchers will then not observe outcomes of individual subjects being treated rather the whole prison being treated. That is the outcomes will be different. Priosoners may understand the reading as an imposed uneasy duty and this idea may get into the minds of the prisoners who would otherwise became less violent due to the reading and never would they regrad reading as a imposed duty. Hence, the effect of the reading on these prisoners will be skewed by the interference of other prisoners. In the example with only 10 tested prisoners interference was less likely as they were easily sepearted (though the separation led to the questioning of excludability restriction), but with the entire prison reading seclusion is impossible and the outcome will be better predicted by sociological theories explaining group behaviour rather than mere enlarging of individual effects of reading to the whole population. Perhaps, if few prisons were such tested, we would get better conclusions; however, this 'more data -> better conclusions' really applies to everything, so it is not the brightest idea.
+
+
+## 3. "No causation without manipulation"
+#### If  no variable is manipulated, then we do not know neither which parameter influences the outcome nor to what extent. Only when manipulating the parameters we observe different outcomes which we can compare and subsequently we can ascribe some causal influence of the manipulated paramter to the outcome. Without manipulation we are blind.  
+
+## 4.
+
+#### a. Is sports club membership and consistent participation for people aged 12-15 good predictor of future earnings?
+
+#### b. We could control for at least the most obvious predictors of future earnings such as family size, parental income, highest achieved education of parents, place of living (city vs. countryside). We would look only at a relatively inexpansive and popular sports such as football, running, floorball, swimming more expansive sports such as yachting, golf etc. would be excluded as a participation in them requires greater wealth (though if the wealth was controlled by the parental income variable this might be fine). There would be two treatment groups one recieving the treatment the other being the control group. The independent variable would be the membership and consistent attendance of tranings set justified threshold (eg. 3 hours a week allocated to the sport). Meanwhile the control group would be forbidden from any physical exercise. The outcome variable would be the average monthly income ie. a continous variable.
+
+#### c. Forbidding physical exercise is probably harmful and also kind of totalitarian. Researching the treated group could temper with their sports results which may or may not be important to them. But if they are important to them, this should be considered. Also the mandatory sports participation may lead to the treated teenagers not being able to allocate their time to other activities like family, friends, studying. Perhaps the experiment may show that active sports club membership decreases future income, this would be unethical too.
+
+#### d. Most realistic is natural experiment. Some of the entry data could be acquired from the sports clubs, but much would be probably missing (parental income, highest achieved educationa by parents etc.). The outcomes could be collected based on the info gathered from the clubs, though this would probably be a breach of privacy. The unit of analysis would be individuals, treatment would be the consistent participation in a sports club between 12 - 15 years. Outcome would be the current levels of income.
+
+#### e. Here comes the issue of unequal treatment which may come as a result of some teenagers being more active than othes in the sports club. This could be taken care of by researching only a group of treated individuals who dedicated approximately the same efforts and time to their sports activities. However, to get a more holistic picture it would be better to reseach all the treated individuals and then deviding them into subgroups. It would be difficult yet important to note whether the subgroups are not somehow different eg. the most competitive teenagers having parents who used to be competitive sportsmen and wommen as well. 
+
+#### f. Since it is a natural experiment recruitment as such would not take place however getting the necessary data from the sports clubs and the current incomes would be quite difficult if not impossible. The issue of interference is definitely present though not that much between treated and control groups but rather betwen the different subgroups of the treated sample. For example, the more competitive teenagers could push each other to their limits thereby exacting more than scheduled treatment.Generally, interference of creating the narrative around sports training, some may persuade others that it is unimportant or the opposite. Some may take it as a mere fun while others may regard it as a means to an important goal; these narratives will then be accepted by some and rejected by others both of which influences the outcome but does not count into the treatment.
+
+
+
+
+
