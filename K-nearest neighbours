@@ -1,0 +1,62 @@
+import codecademylib3_seaborn
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
+
+
+breast_cancer_data = load_breast_cancer()
+print(breast_cancer_data.data[0])
+print(breast_cancer_data.target, breast_cancer_data.target_names)
+
+training_data, validation_data, training_labels, validation_labels = train_test_split(breast_cancer_data.data, breast_cancer_data.target, test_size = 0.2, random_state = 400)
+
+print(len(training_data), len(training_labels))
+acc = []
+for k in range(1,100):
+  classifier = KNeighborsClassifier(n_neighbors = k)
+  classifier.fit(training_data, training_labels)
+  acc.append(classifier.score(validation_data, validation_labels))
+k_list = range(1,100)
+
+plt.plot(k_list, acc)
+plt.xlabel("k")
+plt.ylabel("Validation Accuracy")
+plt.title("Breast Cancer Classifier Accuracy")
+plt.show()
+
+
+###################   CREATING K-NEAREST NEIGHBOURS REGRESSOR
+from movies import movie_dataset, movie_ratings
+
+def distance(movie1, movie2):
+  squared_difference = 0
+  for i in range(len(movie1)):
+    squared_difference += (movie1[i] - movie2[i]) ** 2
+  final_distance = squared_difference ** 0.5
+  return final_distance
+
+def predict(unknown, dataset, movie_ratings, k):
+  distances = []
+  #Looping through all points in the dataset
+  
+
+  for title in dataset:
+    movie = dataset[title]
+    distance_to_point = distance(movie, unknown)
+    #Adding the distance and point associated with that distance
+    distances.append([distance_to_point, title])
+  distances.sort()
+  #Taking only the k closest points
+  neighbors = distances[0:k]
+  numerator = 0
+  denominator = 0
+  for neighbor in neighbors:
+    title = neighbor[1]
+    rating = movie_ratings[title]
+    distance_to_neighbor = neighbor[0]
+    numerator += rating / distance_to_neighbor
+    
+    denominator += 1/distance_to_neighbor
+  return numerator/denominator
+print(predict([0.016, 0.300, 1.022], movie_dataset, movie_ratings, k = 5))
