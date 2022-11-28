@@ -30,10 +30,10 @@ corresponding files: Data Cleaning in Python, Data Visualization in Python, Aggr
 
 UNDISCLOSED PROJECTS:
 
-Non-neural networks NLP for Prague start-up MAMA.AI
-Building conversational tree
-Automizing work of call centres
-I cannot reveal the code due to Non-Disclosure Agreement
+- Non-neural networks NLP for Prague start-up MAMA.AI
+- Building conversational tree
+- Automizing work of call centres
+- I cannot reveal the code due to Non-Disclosure Agreement
 
 
 <!---
