@@ -17,7 +17,7 @@ Causal Inference and Machine Learning for Politics - Module at Humboldt Universi
 - PS 5 is a data cleaning and a simplified replication of 2011 Regression Discontinuity Design paper Incumbency Advantage in Brazil: Evidence from Municipal Mayor Elections by Rocio Titiunik 
 - PS 6 is a simplified replication of a 2012 Diff-in-Diff paper Commodity Price Shocks and Civil Conflict: Evidence from Colombia by Dube and Vargas
 - PS 7 uses Matching method between similar treated and control subjects
-- PS 8 uses interaction effects and Mathing methods
+- PS 8 uses interaction effects and Matching methods
 
 - PS 9 was introduction to Machine Learning (bias, variance, K-nearest neighbors)
 - PS 10 was regression and classification
