@@ -1,7 +1,6 @@
 - 👋 Hi, I’m @Project-Sebi
 -  I’m a Bachelor student of Philosophy at KCL
-- 👀 In terms of programming, I'm currently interested in data science and machine learning. I am somewhat comfortable with R and Python I also have experience with Java, but  from a few years back.
-- 🌱 I’m currently learning Machine Learning methods specifically: Tree-based methods, Support Vector Machines and Deep Learning.
+- 👀 In terms of programming, I'm currently interested in data science and machine learning. I am comfortable wit Python less so with R and I also have experience with Java, but from a few years back.
 - 💞️ I’m looking to collaborate on Machine Learning projects and learn ML methods thoroughly.
 - 📫 How to reach me: stros.seb@gmail.com
 
@@ -29,11 +28,12 @@ CodeAcademy course, Exploratory Data Analysis in Python
 pandas, numpy, matplotlib, seaborn
 corresponding files: Data Cleaning in Python, Data Visualization in Python, Aggregate Functions in Pandas
 
-WORKING ON:
+UNDISCLOSED PROJECTS:
 
-CodeAcademy course: Build a Machine Learning Model with Python
-sklearn
-corresponding files: K-nearest neighbours, Logistic Regression Titanic dataset
+Non-neural networks NLP for Prague start-up MAMA.AI
+Building conversational tree
+Automizing work of call centres
+I cannot reveal the code due to Non-Disclosure Agreement
 
 
 <!---
